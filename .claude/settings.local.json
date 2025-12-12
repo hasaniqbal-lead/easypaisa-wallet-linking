@@ -20,7 +20,11 @@
       "Bash(ssh root@72.60.110.249 \"cd /opt/easypaisa-wallet && ls -la && chmod +x deploy.sh\")",
       "Bash(ssh:*)",
       "Bash(curl:*)",
-      "Bash(tar:*)"
+      "Bash(tar:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix circular dependency: Add forwardRef to TransactionsModule\n\nBoth WalletLinksModule and TransactionsModule import each other, causing\na circular dependency. Added forwardRef to both modules to resolve this.\n\nChanges:\n- TransactionsModule: Added forwardRef(() => WalletLinksModule)\n- WalletLinksModule: Added forwardRef(() => TransactionsModule) (already done)\n\nThis fixes the \"UndefinedModuleException\" error on application startup.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
