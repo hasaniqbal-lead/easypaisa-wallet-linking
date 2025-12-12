@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: easypaisa-db
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-easypaisa_wallet}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: easypaisa-app
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3000}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME:-easypaisa_wallet}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      EASYPAISA_BASE_URL: ${EASYPAISA_BASE_URL}
+      EASYPAISA_USERNAME: ${EASYPAISA_USERNAME}
+      EASYPAISA_PASSWORD: ${EASYPAISA_PASSWORD}
+      EASYPAISA_STORE_ID: ${EASYPAISA_STORE_ID}
+      EASYPAISA_PRIVATE_KEY_PATH: ${EASYPAISA_PRIVATE_KEY_PATH:-./keys/private-key.pem}
+      EASYPAISA_TIMEOUT_MS: ${EASYPAISA_TIMEOUT_MS:-30000}
+      API_KEY_SALT_ROUNDS: ${API_KEY_SALT_ROUNDS:-10}
+      DEFAULT_RATE_LIMIT: ${DEFAULT_RATE_LIMIT:-100}
+    ports:
+      - "${PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+    driver: local

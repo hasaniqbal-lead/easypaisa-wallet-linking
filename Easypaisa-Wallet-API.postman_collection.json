@@ -1,0 +1,799 @@
+{
+	"info": {
+		"_postman_id": "easypaisa-wallet-linking-api",
+		"name": "Wallet Linking API (Multi-Provider)",
+		"description": "Complete API collection for Multi-Provider Wallet Linking Service. Supports Easypaisa (active) and JazzCash (coming soon). Deployed at link.mycodigital.io with HTTPS.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health & Status",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check if the service is healthy and database is connected"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "V2 - Provider-Based Routes (Recommended)",
+			"description": "New provider-based API routes. Use these for new integrations. Pattern: /api/v1/:provider/wallet/*",
+			"item": [
+				{
+					"name": "Easypaisa",
+					"item": [
+						{
+							"name": "[Easypaisa] Generate OTP",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"mobileNumber\": \"{{mobile_number}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/easypaisa/wallet/generate-otp",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"easypaisa",
+										"wallet",
+										"generate-otp"
+									]
+								},
+								"description": "Generate OTP for Easypaisa wallet linking. Response includes provider='easypaisa' and walletLinkId. Save the walletLinkId for linking step."
+							},
+							"response": []
+						},
+						{
+							"name": "[Easypaisa] Link Wallet",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"walletLinkId\": \"{{wallet_link_id}}\",\n  \"otp\": \"123456\",\n  \"amount\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/easypaisa/wallet/link",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"easypaisa",
+										"wallet",
+										"link"
+									]
+								},
+								"description": "Link Easypaisa wallet using OTP. Use walletLinkId from Generate OTP response. Amount is typically PKR 1 for verification. Response includes merchantToken in format: mypay-ep-XXXXXX"
+							},
+							"response": []
+						},
+						{
+							"name": "[Easypaisa] Process Payment",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"walletLinkId\": \"{{wallet_link_id}}\",\n  \"merchantOrderId\": \"ORDER_{{$timestamp}}\",\n  \"amount\": 100.00\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/easypaisa/transactions/process",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"easypaisa",
+										"transactions",
+										"process"
+									]
+								},
+								"description": "Process payment using Easypaisa wallet link. Requires walletLinkId from link step. merchantOrderId must be unique for idempotency."
+							},
+							"response": []
+						},
+						{
+							"name": "[Easypaisa] Get Wallet Status",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/easypaisa/wallet/status/{{mobile_number}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"easypaisa",
+										"wallet",
+										"status",
+										"{{mobile_number}}"
+									]
+								},
+								"description": "Check if mobile number has an active Easypaisa wallet link"
+							},
+							"response": []
+						},
+						{
+							"name": "[Easypaisa] Delink Wallet",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"walletLinkId\": \"{{wallet_link_id}}\",\n  \"reason\": \"Customer requested deactivation\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/easypaisa/wallet/delink",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"easypaisa",
+										"wallet",
+										"delink"
+									]
+								},
+								"description": "Deactivate Easypaisa wallet link"
+							},
+							"response": []
+						},
+						{
+							"name": "[Easypaisa] Get Transactions",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/easypaisa/transactions?status=completed&limit=10&offset=0",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"easypaisa",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "completed",
+											"description": "Filter by status: pending, completed, failed"
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"description": "Number of records to return"
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"description": "Number of records to skip"
+										}
+									]
+								},
+								"description": "Get list of Easypaisa transactions with filters"
+							},
+							"response": []
+						},
+						{
+							"name": "[Easypaisa] Get Transaction by ID",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/easypaisa/transactions/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"easypaisa",
+										"transactions",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "transaction-uuid-here",
+											"description": "Transaction UUID"
+										}
+									]
+								},
+								"description": "Get details of specific Easypaisa transaction"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "JazzCash (Coming Soon)",
+					"item": [
+						{
+							"name": "[JazzCash] Generate OTP - Not Yet Supported",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{api_key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-API-Key",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"mobileNumber\": \"{{mobile_number}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/jazzcash/wallet/generate-otp",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"jazzcash",
+										"wallet",
+										"generate-otp"
+									]
+								},
+								"description": "JazzCash provider is not yet implemented. This will return: 'Unsupported wallet provider: jazzcash'. Coming soon!"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "V1 - Legacy Routes (Backward Compatible)",
+			"description": "Original API routes without provider in path. Maintained for backward compatibility. Use V2 routes for new integrations.",
+			"item": [
+				{
+					"name": "Generate OTP",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{api_key}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-API-Key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mobileNumber\": \"{{mobile_number}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/wallet/generate-otp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"wallet",
+								"generate-otp"
+							]
+						},
+						"description": "Legacy route - uses default provider (Easypaisa). Prefer V2 provider-based routes."
+					},
+					"response": []
+				},
+				{
+					"name": "Link Wallet",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{api_key}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-API-Key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"walletLinkId\": \"{{wallet_link_id}}\",\n  \"otp\": \"123456\",\n  \"amount\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/wallet/link",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"wallet",
+								"link"
+							]
+						},
+						"description": "Legacy route - uses default provider. Prefer V2 provider-based routes."
+					},
+					"response": []
+				},
+				{
+					"name": "Process Payment",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{api_key}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-API-Key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"walletLinkId\": \"{{wallet_link_id}}\",\n  \"merchantOrderId\": \"ORDER_{{$timestamp}}\",\n  \"amount\": 100.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions/process",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"process"
+							]
+						},
+						"description": "Legacy route - uses default provider. Prefer V2 provider-based routes."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Wallet Status",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{api_key}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-API-Key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/wallet/status/{{mobile_number}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"wallet",
+								"status",
+								"{{mobile_number}}"
+							]
+						},
+						"description": "Legacy route. Prefer V2 provider-based routes."
+					},
+					"response": []
+				},
+				{
+					"name": "Delink Wallet",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{api_key}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-API-Key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"walletLinkId\": \"{{wallet_link_id}}\",\n  \"reason\": \"Customer requested deactivation\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/wallet/delink",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"wallet",
+								"delink"
+							]
+						},
+						"description": "Legacy route. Prefer V2 provider-based routes."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transactions",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{api_key}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-API-Key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions?status=completed&limit=10&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "completed",
+									"description": "Filter by status"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Legacy route. Prefer V2 provider-based routes."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction by ID",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{api_key}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-API-Key",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "transaction-uuid-here"
+								}
+							]
+						},
+						"description": "Legacy route. Prefer V2 provider-based routes."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Documentation",
+			"item": [
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/docs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"docs"
+							]
+						},
+						"description": "Interactive Swagger API documentation"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://link.mycodigital.io",
+			"type": "string",
+			"description": "Production base URL with HTTPS and SSL"
+		},
+		{
+			"key": "api_key",
+			"value": "test_api_key_12345",
+			"type": "string",
+			"description": "Test merchant API key for development"
+		},
+		{
+			"key": "mobile_number",
+			"value": "03001234567",
+			"type": "string",
+			"description": "Test mobile number (Pakistani format)"
+		},
+		{
+			"key": "wallet_link_id",
+			"value": "",
+			"type": "string",
+			"description": "Save walletLinkId from Generate OTP response here for subsequent requests"
+		}
+	]
+}

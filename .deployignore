@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.env
+.vscode
+*.log
+npm-debug.log*
+coverage
+.DS_Store
+PROJECT_COMPLETE_SUMMARY.md
+SETUP_GUIDE.md
+IMPLEMENTATION_COMPLETE.md
+scripts/test-signature.js
+.deployignore

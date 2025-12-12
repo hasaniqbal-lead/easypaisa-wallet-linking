@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(node dist/scripts/test-signature.js:*)",
+      "Bash(psql:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(powershell -Command \"Start-Process ''C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe''\")",
+      "Bash(docker-compose logs:*)",
+      "Bash(npm run migration:run:*)",
+      "Bash(docker exec:*)",
+      "Bash(export DATABASE_PASSWORD=postgres:*)",
+      "Bash(node -e:*)",
+      "Bash(npm run start:dev:*)",
+      "Bash(ssh root@72.60.110.249 \"docker compose version && netstat -tuln | grep -E '':(80|443|3001)'' && docker network ls && docker ps -a\")",
+      "Bash(ssh root@72.60.110.249 \"mkdir -p /opt/easypaisa-wallet && ls -la /opt/\")",
+      "Bash(scp:*)",
+      "Bash(ssh root@72.60.110.249 \"cd /opt/easypaisa-wallet && ls -la && chmod +x deploy.sh\")",
+      "Bash(ssh:*)",
+      "Bash(curl:*)",
+      "Bash(tar:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,63 @@
+version: '3.8'
+
+networks:
+  easypaisa-network:
+    name: easypaisa-network
+    driver: bridge
+  coolify:
+    external: true
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: easypaisa-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-easypaisa}
+      POSTGRES_USER: ${DATABASE_USER:-easypaisa}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - easypaisa-db-data:/var/lib/postgresql/data
+    networks:
+      - easypaisa-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-easypaisa} -d ${DATABASE_NAME:-easypaisa}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: easypaisa-app
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - easypaisa-network
+      - coolify
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.easypaisa.rule=Host(`easypaisa.mycodigital.io`)"
+      - "traefik.http.routers.easypaisa.entrypoints=https"
+      - "traefik.http.routers.easypaisa.tls=true"
+      - "traefik.http.routers.easypaisa.tls.certresolver=letsencrypt"
+      - "traefik.http.services.easypaisa.loadbalancer.server.port=3000"
+      - "traefik.docker.network=coolify"
+
+volumes:
+  easypaisa-db-data:
+    name: easypaisa-db-data
