@@ -51,11 +51,11 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.easypaisa.rule=Host(`easypaisa.mycodigital.io`)"
-      - "traefik.http.routers.easypaisa.entrypoints=https"
-      - "traefik.http.routers.easypaisa.tls=true"
-      - "traefik.http.routers.easypaisa.tls.certresolver=letsencrypt"
-      - "traefik.http.services.easypaisa.loadbalancer.server.port=3000"
+      - "traefik.http.routers.wallet-link.rule=Host(`link.mycodigital.io`)"
+      - "traefik.http.routers.wallet-link.entrypoints=https"
+      - "traefik.http.routers.wallet-link.tls=true"
+      - "traefik.http.routers.wallet-link.tls.certresolver=letsencrypt"
+      - "traefik.http.services.wallet-link.loadbalancer.server.port=3000"
       - "traefik.docker.network=coolify"
 
 volumes:
