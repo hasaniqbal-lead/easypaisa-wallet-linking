@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException, ConflictException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction, TransactionType, TransactionStatus } from './entities/transaction.entity';
@@ -14,6 +14,7 @@ export class TransactionsService {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     private easypaisaService: EasypaisaService,
+    @Inject(forwardRef(() => WalletLinksService))
     private walletLinksService: WalletLinksService,
   ) {}
 
